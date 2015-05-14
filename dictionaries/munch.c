@@ -145,7 +145,7 @@ int main(int argc, char** argv)
                numwords++;
                n = 0;
                if (al)
-		 expand_rootword(nword,nwl,as);
+		 expand_rootword(nword,nwl,as,al);
                for (k=0; k<numwords; k++) {
 		 if (lookup(wlist[k].word)) n++;
                  free(wlist[k].word);
@@ -250,7 +250,11 @@ int parse_aff_file(FILE * afflst)
           /* now parse all of the sub entries*/
           nptr = ptr;
           for (j=0; j < numents; j++) {
-             if (!fgets(line,MAX_LN_LEN,afflst)) return 1;
+             if (!fgets(line,MAX_LN_LEN,afflst)) {
+    			fprintf(stderr,"Error parsing all sub-entries\n");
+				fprintf(stderr,"number of elements = %d", numents);
+				return 1;
+			}
              mychomp(line);
              tp = line;
              i = 0;
@@ -644,7 +648,8 @@ void add_affix_char(struct hentry * ep, char ac)
   al = strlen(ep->affstr);
   for (i=0; i< al; i++)
     if (ac == (ep->affstr)[i]) return;
-  tmp = calloc(al+2,1);
+  // tmp = calloc(al+2,1);
+  tmp = calloc((al+2),sizeof(char)); // original string
   memcpy(tmp,ep->affstr,(al+1));
   *(tmp+al) = ac;
   *(tmp+al+1)='\0';
@@ -748,7 +753,7 @@ void suf_add (const char * word, int len, struct affent * ep, int num)
 
 
 
-int expand_rootword(const char * ts, int wl, const char * ap)
+int expand_rootword(const char * ts, int wl, const char * apm int al)
 {
     int i;
     int j;
@@ -825,9 +830,13 @@ char * mystrdup(const char * s)
 {
   char * d = NULL;
   if (s) {
-    int sl = strlen(s)+1;
-    d = (char *) malloc(sl);
-    if (d) memcpy(d,s,sl);
+//    int sl = strlen(s)+1;
+//    d = (char *) malloc(sl);
+//    if (d) memcpy(d,s,sl);
+
+    int sl = strlen(s);
+    d = (char *) malloc(((sl+1) * sizeof(char)));
+    if (d) memcpy(d,s,((sl+1)*sizeof(char)));
   }
   return d;
 }
